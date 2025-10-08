@@ -4,10 +4,10 @@ import Loader from "../components/Loaders/DashboardLoader";
 
 const tools = [
   { name: "Merge PDF", path: "/merge-pdf", color: "from-green-400 to-green-600" },
-  { name: "PDF → Word", path: "/pdf-to-word", color: "from-green-400 to-green-600" },
+  { name: "PDF → Word(only text-based pdfs)", path: "/pdf-to-word", color: "from-red-400 to-red-600" },
   { name: "Word → PDF", path: "/word-to-pdf", color: "from-green-400 to-green-600" },
   { name: "PPTX → PDF", path: "/pptx-to-pdf", color: "from-green-400 to-green-600" },
-  { name: "PDF → PPTX", path: "/pdf-to-pptx", color: "from-green-400 to-green-600" },
+  { name: "PDF → PPTX", path: "/pdf-to-pptx", color: "from-red-400 to-red-600" },
   { name: "IMG → PDF", path: "/jpg-to-pdf", color: "from-green-400 to-green-600" },
   { name: "Protect PDF", path: "/protect-pdf", color: "from-green-400 to-green-600" },
   { name: "Compress PDF", path: "/compress", color: "from-green-400 to-green-600" },

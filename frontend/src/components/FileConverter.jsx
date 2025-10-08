@@ -172,7 +172,7 @@ const FileConverter = ({
               className="bg-white/90 backdrop-blur-sm text-indigo-600 px-3 py-1 rounded-lg shadow text-xs font-semibold hover:bg-white transition-all"
               title="Open in new tab"
             >
-              Open
+              🔗 Open
             </button>
           </div>
         </div>
@@ -267,7 +267,7 @@ const FileConverter = ({
           onChange={handleFileChange}
           className="hidden"
           id="fileInput"
-          multiple={responseType !== "blob"}
+          multiple
         />
         <label htmlFor="fileInput" className="cursor-pointer text-center px-6 py-4 w-full h-full flex flex-col items-center justify-center">
           <div className="text-6xl mb-4">
@@ -318,7 +318,7 @@ const FileConverter = ({
             Converting...
           </span>
         ) : (
-          "Convert Files"
+          "🚀 Convert Files"
         )}
       </button>
 
@@ -353,7 +353,7 @@ const FileConverter = ({
                     onClick={() => handleDownload(f)}
                     className="inline-block px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all text-sm font-semibold cursor-pointer"
                   >
-                    Download
+                    ⬇️ Download
                   </button>
                 </div>
               </div>
