@@ -5,7 +5,7 @@ import { FileText, File, FileImage, Lock, Minimize2, Image, Edit3, Scissors, Gri
 
 const tools = [
   { name: "Merge PDF", path: "/merge-pdf", icon: FileText, description: "Combine PDFs in the order you want" },
-  { name: "PDF to Word", path: "/pdf-to-word", icon: File, description: "Convert PDF to editable Word (text-based only)" },
+  { name: "PDF to Word", path: "/pdf-to-word", icon: File, description: "Convert PDF to editable Word" },
   { name: "Word to PDF", path: "/word-to-pdf", icon: FileText, description: "Make DOC and DOCX files easy to read" },
   { name: "PPTX to PDF", path: "/pptx-to-pdf", icon: FileText, description: "Turn presentations into PDFs" },
   { name: "PDF to PPTX", path: "/pdf-to-pptx", icon: File, description: "Convert PDF to PowerPoint slides" },
@@ -56,8 +56,6 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-
-      {/* Hero Section */}
       <div className="container mx-auto px-4 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
           {/* Left Content */}
@@ -76,16 +74,13 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* Right Illustration */}
           <div className="relative h-96 lg:h-[500px]">
-            {/* Floating Icons - Positioned Outside Documents */}
             <FloatingIcon icon={FileText} color="bg-red-500" delay={0} position={{ top: '5%', left: '2%' }} />
             <FloatingIcon icon={Lock} color="bg-purple-500" delay={0.5} position={{ top: '8%', right: '5%' }} />
             <FloatingIcon icon={Minimize2} color="bg-green-500" delay={1} position={{ top: '45%', left: '0%' }} />
             <FloatingIcon icon={FileImage} color="bg-yellow-500" delay={1.5} position={{ bottom: '10%', right: '2%' }} />
             <FloatingIcon icon={File} color="bg-blue-500" delay={2} position={{ bottom: '5%', left: '8%' }} />
 
-            {/* Document Transformation Animation */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-30 w-full max-w-md z-10">
               <div className="relative">
                 {/* Left Document - Input */}
@@ -99,7 +94,6 @@ function Dashboard() {
                   </div>
                 </div>
 
-                {/* Center - Transformation Arrow */}
                 <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
                   <div className="bg-white rounded-full p-4 shadow-xl animate-pulse">
                     <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,7 +102,6 @@ function Dashboard() {
                   </div>
                 </div>
 
-                {/* Right Document - Output */}
                 <div className="absolute right-0 top-0 transform rotate-12 hover:rotate-0 transition-all duration-500">
                   <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-2xl p-6 w-40 h-52">
                     <div className="flex flex-col items-center justify-center h-full text-white">
@@ -119,7 +112,6 @@ function Dashboard() {
                   </div>
                 </div>
 
-                {/* Bottom Documents - Additional Formats */}
                 <div className="absolute bottom-0 left-1/4 transform translate-y-20 -rotate-6">
                   <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-xl p-4 w-32 h-40">
                     <div className="flex flex-col items-center justify-center h-full text-white">
@@ -147,7 +139,6 @@ function Dashboard() {
               </div>
             </div>
 
-            {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-full filter blur-3xl opacity-50 animate-pulse"></div>
             <div className="absolute bottom-0 left-0 w-40 h-40 bg-purple-100 rounded-full filter blur-3xl opacity-50 animate-pulse" style={{ animationDelay: '1s' }}></div>
             <div className="absolute top-1/2 left-0 w-36 h-36 bg-green-100 rounded-full filter blur-3xl opacity-40 animate-pulse" style={{ animationDelay: '2s' }}></div>
@@ -155,7 +146,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Tools Section */}
       <div id="tools-section" className="container mx-auto px-4 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -167,7 +157,6 @@ function Dashboard() {
             </p>
           </div>
 
-          {/* Tools Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {tools.map((tool, index) => {
               const Icon = tool.icon;
@@ -201,7 +190,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Bottom CTA Section */}
       <div className="bg-gradient-to-r from-red-600 via-pink-500 to-[#1224ec] py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center text-white">
