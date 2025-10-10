@@ -267,7 +267,7 @@ const FileConverter = ({
           onChange={handleFileChange}
           className="hidden"
           id="fileInput"
-          multiple={responseType !== "blob"}
+          multiple
         />
         <label htmlFor="fileInput" className="cursor-pointer text-center px-6 py-4 w-full h-full flex flex-col items-center justify-center">
           <div className="text-6xl mb-4">

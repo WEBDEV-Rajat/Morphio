@@ -69,17 +69,18 @@ const FileConverter = ({
             }]);
           } else {
             const response = JSON.parse(xhr.responseText);
-            console.log("API Response:", response);
+            console.log("API Response:", JSON.stringify(response, null, 2));
 
             const converted = response.map((fileObj) => {
               const fullUrl = `http://localhost:5000${fileObj.url}`;
-              console.log("File:", fileObj.name, "URL:", fullUrl);
+              console.log("File:", fileObj.name, "URL:", fullUrl, "Original:", fileObj.originalName);
               
               return {
                 name: fileObj.name,
                 url: fullUrl,
                 outputType,
-                isBlob: false
+                isBlob: false,
+                originalName: fileObj.originalName // Use for display
               };
             });
 
@@ -117,6 +118,7 @@ const FileConverter = ({
     const extensions = {
       pdf: ".pdf",
       docx: ".docx",
+      pptx: ".pptx", // Added for PPTX output
       png: ".png",
       jpg: ".jpg",
       jpeg: ".jpeg",
@@ -126,18 +128,18 @@ const FileConverter = ({
   };
 
   const getPreviewComponent = (file, idx) => {
-    const { outputType, url, name } = file;
+    const { outputType, url, name, originalName } = file;
     
     if (outputType === "pdf") {
       return (
         <div className="w-full h-96 border-2 border-gray-300 rounded-xl shadow-lg bg-gray-50 overflow-hidden relative">
           <object
-            data={`${url}`}
+            data={url}
             type="application/pdf"
             className="w-full h-full"
           >
             <embed
-              src={`${url}`}
+              src={url}
               type="application/pdf"
               className="w-full h-full"
             />
@@ -186,15 +188,15 @@ const FileConverter = ({
           onError={(e) => console.error("Image load error:", e)}
         />
       );
-    } else if (outputType === "docx") {
+    } else if (outputType === "docx" || outputType === "pptx") {
       return (
         <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border-2 border-gray-300">
           <div className="text-center p-6">
             <svg className="w-24 h-24 text-blue-600 mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
-            <p className="text-gray-800 font-semibold mb-2">Word Document Preview Unavailable</p>
-            <p className="text-gray-600 text-sm mb-4">Download to view in Word or compatible viewer</p>
+            <p className="text-gray-800 font-semibold mb-2">{outputType.toUpperCase()} Preview Unavailable</p>
+            <p className="text-gray-600 text-sm mb-4">Download to view in {outputType === "docx" ? "Word" : "PowerPoint"} or compatible viewer</p>
           </div>
         </div>
       );
@@ -212,16 +214,28 @@ const FileConverter = ({
 
   const handleDownload = async (file) => {
     try {
+      console.log('Attempting to download:', {
+        url: file.url,
+        name: file.name,
+      });
+
       if (file.isBlob) {
         const link = document.createElement('a');
         link.href = file.url;
-        link.download = file.name;
+        link.download = file.originalName || file.name;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } else {
-        const response = await fetch(file.url);
-        if (!response.ok) throw new Error(`Failed to fetch: ${response.statusText}`);
+        const response = await fetch(file.url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+          }
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${file.url}: ${response.statusText}`);
+        }
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -231,10 +245,11 @@ const FileConverter = ({
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(blobUrl);
+        console.log(`Successfully downloaded: ${file.name}`);
       }
     } catch (error) {
-      console.error("Download error:", error);
-      alert("Download failed. Trying to open in new tab instead.");
+      console.error(`Download error for ${file.name}:`, error);
+      alert(`Failed to download ${file.name}. The file may not exist or the server is unreachable. Trying to open in new tab.`);
       window.open(file.url, '_blank');
     }
   };
@@ -348,7 +363,9 @@ const FileConverter = ({
                 {getPreviewComponent(f, idx)}
                 
                 <div className="mt-4 text-center">
-                  <p className="text-sm text-gray-600 mb-3 truncate px-2" title={f.name}>{f.name}</p>
+                  <p className="text-sm text-gray-600 mb-3 truncate px-2" title={f.originalName || f.name}>
+                    {f.originalName || f.name}
+                  </p>
                   <button
                     onClick={() => handleDownload(f)}
                     className="inline-block px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all text-sm font-semibold cursor-pointer"

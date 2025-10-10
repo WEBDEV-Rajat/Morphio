@@ -12,7 +12,7 @@ import jpgToPngRoutes from "./routes/jpgToPng.js";
 import pngToJpgRoutes from "./routes/pngToJpg.js";
 import mergePdfRoutes from "./routes/mergePdf.js";
 import protectPdfRoutes from "./routes/pdfProtect.js";
-// import pdfToPptxRoutes from "./routes/pdfToPptx.js";
+import pdfToPptxRoutes from "./routes/pdfToPptx.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,7 +32,7 @@ app.use("/api/convert/pdf-to-word", pdfToWordRoutes);
 app.use("/api/compress", compressPdfRoutes);
 app.use("/api/convert/jpg-to-png", jpgToPngRoutes);
 app.use("/api/convert/png-to-jpg", pngToJpgRoutes);
-// app.use("/api/convert/pdf-to-pptx", pdfToPptxRoutes);
+app.use("/api/convert/pdf-to-pptx", pdfToPptxRoutes);
 app.use("/api/merge-pdf", mergePdfRoutes);
 app.use("/api/protect-pdf", protectPdfRoutes);
 
