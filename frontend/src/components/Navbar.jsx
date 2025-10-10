@@ -173,10 +173,6 @@ function Navbar() {
             </li>
           </ul>
         </div>
-
-        {/* <div className="flex items-center gap-6 text-gray-700 font-medium">
-          <NavLink to="/ai-pdf" className="hover:text-gray-900 transition-colors">AI PDF</NavLink>
-        </div> */}
       </div>
     </nav>
   );

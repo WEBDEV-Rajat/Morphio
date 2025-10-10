@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loaders/DashboardLoader";
-import { FileText, File, FileImage, Lock, Minimize2, Image, Edit3, Scissors, Grid } from "lucide-react";
+import { FileText, File, FileImage, Lock, Minimize2, Image} from "lucide-react";
 
 const tools = [
   { name: "Merge PDF", path: "/merge-pdf", icon: FileText, description: "Combine PDFs in the order you want" },
@@ -58,7 +58,6 @@ function Dashboard() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
-          {/* Left Content */}
           <div className="space-y-8">
             <h1 className="text-5xl lg:text-6xl font-bold  leading-tight">
               Convert Anything With <span className="bg-gradient-to-r from-red-600 via-pink-500 to-[#1224ec]
@@ -83,7 +82,6 @@ function Dashboard() {
 
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-30 w-full max-w-md z-10">
               <div className="relative">
-                {/* Left Document - Input */}
                 <div className="absolute left-0 top-0 transform -rotate-12 hover:rotate-0 transition-all duration-500">
                   <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-2xl p-6 w-40 h-52">
                     <div className="flex flex-col items-center justify-center h-full text-white">

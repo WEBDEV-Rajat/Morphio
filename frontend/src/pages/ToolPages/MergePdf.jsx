@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { Download } from "lucide-react";
 
 const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiEndpoint = "merge-pdf" }) => {
   const [files, setFiles] = useState([]);
@@ -155,16 +156,16 @@ const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiE
           <div className="grid grid-cols-1 gap-4 w-full">
             <iframe
               src={mergedUrl}
-              className="w-full h-96 border rounded-xl shadow-lg bg-white"
+              className="w-full h-96 border rounded-xl shadow-lg bg-white mb-6"
               title="Merged PDF Preview"
             />
           </div>
           <a
             href={mergedUrl}
             download="merged.pdf"
-            className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition-all"
+            className="mt-4 translate-y-2 font-bold rounded-lg shadow-md transition-all"
           >
-            Download PDF
+            <span className="flex gap-4 justify-center py-5 rounded-2xl bg-green-600 hover:bg-green-700 text-white"><Download/> Download PDF</span>
           </a>
         </div>
       )}

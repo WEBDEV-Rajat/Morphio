@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import img1 from "../../src/assets/open-folder.png";
+import img2 from "../../src/assets/closed-folder.png";
+import { Download, File } from "lucide-react";
 
 const FileConverter = ({ 
   title, 
@@ -118,7 +121,7 @@ const FileConverter = ({
     const extensions = {
       pdf: ".pdf",
       docx: ".docx",
-      pptx: ".pptx", // Added for PPTX output
+      pptx: ".pptx",
       png: ".png",
       jpg: ".jpg",
       jpeg: ".jpeg",
@@ -127,8 +130,8 @@ const FileConverter = ({
     return extensions[type] || ".file";
   };
 
-  const getPreviewComponent = (file, idx) => {
-    const { outputType, url, name, originalName } = file;
+  const getPreviewComponent = (file) => {
+    const { outputType, url } = file;
     
     if (outputType === "pdf") {
       return (
@@ -174,7 +177,7 @@ const FileConverter = ({
               className="bg-white/90 backdrop-blur-sm text-indigo-600 px-3 py-1 rounded-lg shadow text-xs font-semibold hover:bg-white transition-all"
               title="Open in new tab"
             >
-              🔗 Open
+              Open
             </button>
           </div>
         </div>
@@ -204,7 +207,7 @@ const FileConverter = ({
       return (
         <div className="w-full h-96 flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl shadow-lg border-2 border-gray-300">
           <div className="text-center">
-            <div className="text-6xl mb-4">📄</div>
+            <div className="text-6xl mb-4"><File className="w-6 h-6"/></div>
             <p className="text-gray-600">Preview not available for {outputType}</p>
           </div>
         </div>
@@ -286,7 +289,11 @@ const FileConverter = ({
         />
         <label htmlFor="fileInput" className="cursor-pointer text-center px-6 py-4 w-full h-full flex flex-col items-center justify-center">
           <div className="text-6xl mb-4">
-            {dragActive ? "📂" : "📁"}
+            {dragActive ? (
+              <img src={img1} className="w-20 h-20" />
+            ) : (
+              <img src={img2} className="w-20 h-20" />
+            )}
           </div>
           <p className="text-lg font-semibold text-gray-700 mb-2">
             {files.length ? `${files.length} file(s) selected` : "Drag & Drop files here"}
@@ -304,7 +311,7 @@ const FileConverter = ({
               className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all"
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <span className="text-2xl">📄</span>
+                <span className="text-2xl"><File className="w-6 h-6 text-blue-500"/></span>
                 <span className="text-sm text-gray-700 truncate">{file.name}</span>
                 <span className="text-xs text-gray-500">({(file.size / 1024).toFixed(2)} KB)</span>
               </div>
@@ -333,7 +340,7 @@ const FileConverter = ({
             Converting...
           </span>
         ) : (
-          "🚀 Convert Files"
+          "Convert Files"
         )}
       </button>
 
@@ -353,7 +360,7 @@ const FileConverter = ({
       {convertedFiles.length > 0 && (
         <div className="mt-12 w-full max-w-6xl">
           <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold text-green-700 mb-2">✅ Conversion Successful!</h2>
+            <h2 className="text-3xl font-bold text-green-700 mb-2">Conversion Successful!</h2>
             <p className="text-gray-600">Your files are ready to download</p>
           </div>
 
@@ -368,9 +375,9 @@ const FileConverter = ({
                   </p>
                   <button
                     onClick={() => handleDownload(f)}
-                    className="inline-block px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all text-sm font-semibold cursor-pointer"
+                    className="inline-block px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all text-sm font-semibold cursor-pointer"
                   >
-                    ⬇️ Download
+                    <span className="flex gap-2 font-bold"><Download className="w-4 h-4"/> Download</span>
                   </button>
                 </div>
               </div>

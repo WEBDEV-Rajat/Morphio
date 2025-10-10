@@ -44,7 +44,7 @@ router.post("/", (req, res) => {
     const tempOutputPath = path.resolve("uploads", "temp_converted.pdf");
 
     try {
-      const doc = new PDFKit({ size: [612, 792] }); // A4 size in points (595.28 x 841.89 scaled to 612 x 792)
+      const doc = new PDFKit({ size: [612, 792] }); 
       const writeStream = fs.createWriteStream(outputPath);
       const tempWriteStream = fs.createWriteStream(tempOutputPath);
       doc.pipe(writeStream);
@@ -54,7 +54,7 @@ router.post("/", (req, res) => {
         const inputPath = path.resolve(file.path);
         if (!fs.existsSync(inputPath)) {
           console.error(`Input file not found: ${file.originalname}`);
-          continue; // Skip missing files
+          continue; 
         }
 
         const imageBuffer = fs.readFileSync(inputPath);
@@ -110,7 +110,6 @@ router.post("/", (req, res) => {
       res.setHeader("Content-Type", "application/pdf");
       res.send(data);
 
-      // Cleanup
       req.files.forEach((file) => {
         const filePath = path.resolve(file.path);
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
@@ -120,7 +119,6 @@ router.post("/", (req, res) => {
     } catch (err) {
       console.error("Image → PDF conversion error:", err.message, err.stack);
 
-      // Cleanup on error
       req.files.forEach((file) => {
         const filePath = path.resolve(file.path);
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);

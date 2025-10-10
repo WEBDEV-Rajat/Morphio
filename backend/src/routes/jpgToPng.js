@@ -6,7 +6,6 @@ import sharp from "sharp";
 
 const router = express.Router();
 
-// Configure multer
 const upload = multer({
   dest: "uploads/",
   fileFilter: (req, file, cb) => {
@@ -17,10 +16,9 @@ const upload = multer({
       cb(new Error("Only JPG/JPEG files are allowed"), false);
     }
   },
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-// Ensure uploads directory exists
 const uploadsDir = path.resolve("uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);

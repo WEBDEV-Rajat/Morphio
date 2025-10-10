@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Download } from "lucide-react";
 
 const ProtectPdf = () => {
   const [file, setFile] = useState(null);
@@ -121,14 +122,14 @@ const ProtectPdf = () => {
             <iframe
               src={protectedUrl}
               title="Protected PDF Preview"
-              className="w-full h-64 border rounded shadow"
+              className="w-full h-64 border rounded shadow mb-5"
             ></iframe>
             <a
               href={protectedUrl}
               download="protected.pdf"
-              className="mt-4 inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              className="mt-4 translate-y-2 font-bold rounded-lg shadow-md transition-all"
             >
-              Download Protected PDF
+              <span className="flex gap-4 justify-center py-5 rounded-2xl bg-green-600 hover:bg-green-700 text-white"><Download/> Download PDF</span>
             </a>
           </div>
         )}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { Download } from "lucide-react";
 
 const CompressPdf = () => {
   const [file, setFile] = useState(null);
@@ -141,7 +142,7 @@ const CompressPdf = () => {
 
       <motion.button
         onClick={handleConvert}
-        className="mt-6 px-6 py-2 bg-purple-600 text-white rounded-lg shadow-lg hover:bg-purple-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+        className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
         whileTap={{ scale: 0.9 }}
         disabled={loading}
       >
@@ -167,7 +168,7 @@ const CompressPdf = () => {
           <div className="relative">
             <iframe
               src={`${convertedFile}#view=FitH`}
-              className="w-full h-96 border rounded-lg shadow"
+              className="w-full h-96 border rounded-lg shadow mb-5"
               title="Preview"
               onError={() => setError("Failed to preview PDF. Try downloading instead.")}
             />
@@ -178,9 +179,9 @@ const CompressPdf = () => {
           <a
             href={convertedFile}
             download="compressed.pdf"
-            className="inline-block mt-4 px-6 py-2 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 transition"
+            className="mt-4 translate-y-2 font-bold rounded-lg shadow-md transition-all"
           >
-            Download PDF
+             <span className="flex gap-4 justify-center py-5 rounded-2xl bg-green-600 text-white"><Download/> Download PDF</span>
           </a>
         </div>
       )}

@@ -17,8 +17,8 @@ router.post("/", upload.single("file"), (req, res) => {
   }
 
   const outputPath = path.join("uploads", `protected-${Date.now()}.pdf`);
-  const userPassword = password; // entered by user
-  const ownerPassword = password + "_adm"; // hidden owner password
+  const userPassword = password; 
+  const ownerPassword = password + "_adm"; 
 
   const command = `qpdf --encrypt "${userPassword}" "${ownerPassword}" 256 -- "${file.path}" "${outputPath}"`;
 
