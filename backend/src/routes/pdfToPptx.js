@@ -1,12 +1,12 @@
 import express from 'express';
 import multer from 'multer';
+import pdfPoppler from 'pdf-poppler';
+import PptxGenJS from 'pptxgenjs';
 import fs from 'fs/promises';
 import path from 'path';
-import { exec } from 'child_process';
 import { fileURLToPath } from 'url';
-import util from 'util';
+import cors from 'cors';
 
-const execPromise = util.promisify(exec);
 const router = express.Router();
 
 // Folder paths
@@ -18,15 +18,13 @@ const UPLOAD_FOLDER = path.resolve('Uploads');
 console.log('UPLOAD_FOLDER:', UPLOAD_FOLDER);
 console.log('Current working directory:', process.cwd());
 
-// Ensure Uploads folder exists and has permissions
+// Ensure Uploads folder exists
 async function ensureFolders() {
   try {
     await fs.mkdir(UPLOAD_FOLDER, { recursive: true });
-    // Set full permissions for Everyone (Windows)
-    await execPromise(`icacls "${UPLOAD_FOLDER}" /grant Everyone:F`);
-    console.log(`Ensured Uploads folder exists with full permissions: ${UPLOAD_FOLDER}`);
+    console.log(`Ensured Uploads folder exists: ${UPLOAD_FOLDER}`);
   } catch (err) {
-    console.error('Error creating Uploads folder or setting permissions:', err);
+    console.error('Error creating Uploads folder:', err);
   }
 }
 
@@ -60,20 +58,62 @@ const upload = multer({
   }
 });
 
-// Test LibreOffice availability
-async function testLibreOffice() {
+// Convert PDF to images using pdf-poppler
+async function convertPdfToImages(pdfPath, outputDir, prefix) {
+  const options = {
+    format: 'png',
+    out_dir: outputDir,
+    out_prefix: prefix,
+    page: null // Convert all pages
+  };
+
   try {
-    const sofficePath = `"C:\\Program Files\\LibreOffice\\program\\soffice.exe"`;
-    const { stdout } = await execPromise(`${sofficePath} --version`);
-    console.log(`LibreOffice version: ${stdout.trim()}`);
-    return true;
+    await pdfPoppler.convert(pdfPath, options);
+    console.log(`Successfully converted PDF to images in ${outputDir}`);
+    const imageFiles = (await fs.readdir(outputDir))
+      .filter(f => f.startsWith(prefix) && f.endsWith('.png'))
+      .sort((a, b) => {
+        const numA = parseInt(a.match(/\d+/)[0]);
+        const numB = parseInt(b.match(/\d+/)[0]);
+        return numA - numB;
+      });
+    return imageFiles;
   } catch (error) {
-    console.error('LibreOffice not found or failed to run:', error);
-    return false;
+    console.error('Error during PDF to image conversion:', error);
+    throw error;
   }
 }
 
-// Convert PDF to PPTX using LibreOffice
+// Convert images to PPTX using pptxgenjs
+async function convertImagesToPptx(imageFiles, outputPath, outputDir) {
+  try {
+    const pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_16x9';
+
+    for (const imageFile of imageFiles) {
+      const slide = pptx.addSlide();
+      const imgPath = path.join(outputDir, imageFile);
+      slide.addImage({
+        path: imgPath,
+        x: 0,
+        y: 0,
+        w: '100%',
+        h: '100%',
+        sizing: { type: 'contain', w: '100%', h: '100%' }
+      });
+      console.log(`Added image to slide: ${imageFile}`);
+    }
+
+    await pptx.writeFile({ fileName: outputPath });
+    console.log(`PPTX file saved to: ${outputPath}`);
+    return true;
+  } catch (error) {
+    console.error('Error creating PPTX from images:', error);
+    throw error;
+  }
+}
+
+// Main conversion function
 async function pdfToPptx(pdfPath, outputPath) {
   try {
     // Verify input PDF exists
@@ -82,61 +122,23 @@ async function pdfToPptx(pdfPath, outputPath) {
     }
     console.log(`Input PDF verified: ${pdfPath}`);
 
-    // Test LibreOffice
-    if (!(await testLibreOffice())) {
-      throw new Error('LibreOffice is not installed or inaccessible');
+    const outputDir = UPLOAD_FOLDER;
+    const prefix = path.basename(pdfPath, path.extname(pdfPath));
+
+    // Convert PDF to images
+    const imageFiles = await convertPdfToImages(pdfPath, outputDir, prefix);
+
+    // Convert images to PPTX
+    await convertImagesToPptx(imageFiles, outputPath, outputDir);
+
+    // Clean up images
+    for (const imageFile of imageFiles) {
+      const imgPath = path.join(outputDir, imageFile);
+      await fs.unlink(imgPath).catch(err => console.error(`Failed to delete image ${imgPath}:`, err));
     }
+    console.log(`Cleaned up temporary images in ${outputDir}`);
 
-    const sofficePath = `"C:\\Program Files\\LibreOffice\\program\\soffice.exe"`;
-    const outputDir = path.dirname(outputPath);
-    const inputBaseName = path.parse(path.basename(pdfPath)).name;
-    const expectedPptxName = `${inputBaseName}.pptx`;
-    const expectedPptxPath = path.join(outputDir, expectedPptxName);
-
-    // Log directory contents before conversion
-    console.log(`Files in ${outputDir} before conversion:`, await fs.readdir(outputDir));
-
-    // Clean up existing PPTX if present
-    if (await fs.access(expectedPptxPath).then(() => true).catch(() => false)) {
-      await fs.unlink(expectedPptxPath);
-      console.log(`Removed existing PPTX: ${expectedPptxPath}`);
-    }
-
-    // Run LibreOffice conversion with specific filter
-    const command = `${sofficePath} --headless --convert-to pptx:impress_msPowerPoint_2007 "${pdfPath}" --outdir "${outputDir}"`;
-    console.log(`Running LibreOffice: ${command}`);
-
-    const { stdout, stderr } = await execPromise(command, { timeout: 60000 }); // 60s timeout
-    console.log(`LibreOffice stdout: ${stdout}`);
-    if (stderr) console.warn(`LibreOffice stderr: ${stderr}`);
-
-    // Wait for file creation
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Log directory contents after conversion
-    console.log(`Files in ${outputDir} after conversion:`, await fs.readdir(outputDir));
-
-    // Check for expected PPTX
-    if (await fs.access(expectedPptxPath).then(() => true).catch(() => false)) {
-      await fs.rename(expectedPptxPath, outputPath);
-      console.log(`Renamed PPTX to: ${outputPath}`);
-      return true;
-    } else {
-      // Check for any PPTX files as a fallback
-      const files = await fs.readdir(outputDir);
-      const pptxFiles = files.filter(f => f.endsWith('.pptx'));
-      if (pptxFiles.length > 0) {
-        console.log(`Found unexpected PPTX files: ${pptxFiles.join(', ')}`);
-        const fallbackPptx = path.join(outputDir, pptxFiles[0]);
-        await fs.rename(fallbackPptx, outputPath);
-        console.log(`Renamed fallback PPTX to: ${outputPath}`);
-        return true;
-      } else {
-        console.error(`Expected PPTX not found: ${expectedPptxPath}`);
-        console.log(`No PPTX files found in ${outputDir}`);
-        throw new Error('Converted PPTX not found');
-      }
-    }
+    return true;
   } catch (error) {
     console.error('Error in pdfToPptx:', error);
     throw error;
@@ -149,7 +151,6 @@ async function cleanupOldFiles() {
     const now = Date.now();
     const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-    // Cleanup Uploads folder
     const files = await fs.readdir(UPLOAD_FOLDER);
     for (const file of files) {
       const filePath = path.join(UPLOAD_FOLDER, file);
@@ -168,7 +169,7 @@ async function cleanupOldFiles() {
 // Run cleanup every 30 minutes
 setInterval(cleanupOldFiles, 30 * 60 * 1000);
 
-// Initial cleanup on startup
+// Initial cleanup
 cleanupOldFiles();
 
 // Convert endpoint

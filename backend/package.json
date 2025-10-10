@@ -25,6 +25,7 @@
     "pdf-lib": "^1.17.1",
     "pdf-merger-js": "^5.1.2",
     "pdf-parse": "^1.1.1",
+    "pdf-poppler": "^0.2.3",
     "pdf2json": "^3.2.2",
     "pdf2pic": "^3.2.0",
     "pdfjs-dist": "^5.4.296",
