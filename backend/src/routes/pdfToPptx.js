@@ -5,20 +5,18 @@ import PptxGenJS from 'pptxgenjs';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import cors from 'cors';
 
 const router = express.Router();
 
-// Folder paths
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const UPLOAD_FOLDER = path.resolve('Uploads');
 
-// Log folder paths for debugging
+
 console.log('UPLOAD_FOLDER:', UPLOAD_FOLDER);
 console.log('Current working directory:', process.cwd());
 
-// Ensure Uploads folder exists
+
 async function ensureFolders() {
   try {
     await fs.mkdir(UPLOAD_FOLDER, { recursive: true });
@@ -30,12 +28,11 @@ async function ensureFolders() {
 
 ensureFolders();
 
-// Sanitize filenames to remove special characters
 const sanitizeFilename = (filename) => {
   return filename.replace(/[^a-zA-Z0-9._-]/g, '_');
 };
 
-// Configure multer for file uploads
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, UPLOAD_FOLDER);
@@ -58,13 +55,12 @@ const upload = multer({
   }
 });
 
-// Convert PDF to images using pdf-poppler
 async function convertPdfToImages(pdfPath, outputDir, prefix) {
   const options = {
     format: 'png',
     out_dir: outputDir,
     out_prefix: prefix,
-    page: null // Convert all pages
+    page: null 
   };
 
   try {
@@ -84,7 +80,6 @@ async function convertPdfToImages(pdfPath, outputDir, prefix) {
   }
 }
 
-// Convert images to PPTX using pptxgenjs
 async function convertImagesToPptx(imageFiles, outputPath, outputDir) {
   try {
     const pptx = new PptxGenJS();
@@ -113,10 +108,8 @@ async function convertImagesToPptx(imageFiles, outputPath, outputDir) {
   }
 }
 
-// Main conversion function
 async function pdfToPptx(pdfPath, outputPath) {
   try {
-    // Verify input PDF exists
     if (!(await fs.access(pdfPath).then(() => true).catch(() => false))) {
       throw new Error(`Input PDF not found: ${pdfPath}`);
     }
@@ -125,13 +118,10 @@ async function pdfToPptx(pdfPath, outputPath) {
     const outputDir = UPLOAD_FOLDER;
     const prefix = path.basename(pdfPath, path.extname(pdfPath));
 
-    // Convert PDF to images
     const imageFiles = await convertPdfToImages(pdfPath, outputDir, prefix);
 
-    // Convert images to PPTX
     await convertImagesToPptx(imageFiles, outputPath, outputDir);
 
-    // Clean up images
     for (const imageFile of imageFiles) {
       const imgPath = path.join(outputDir, imageFile);
       await fs.unlink(imgPath).catch(err => console.error(`Failed to delete image ${imgPath}:`, err));
@@ -145,11 +135,10 @@ async function pdfToPptx(pdfPath, outputPath) {
   }
 }
 
-// Cleanup old files (older than 24 hours)
 async function cleanupOldFiles() {
   try {
     const now = Date.now();
-    const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    const maxAge = 24 * 60 * 60 * 1000; 
 
     const files = await fs.readdir(UPLOAD_FOLDER);
     for (const file of files) {
@@ -166,13 +155,10 @@ async function cleanupOldFiles() {
   }
 }
 
-// Run cleanup every 30 minutes
 setInterval(cleanupOldFiles, 30 * 60 * 1000);
 
-// Initial cleanup
 cleanupOldFiles();
 
-// Convert endpoint
 router.post('/', upload.array('files'), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -194,10 +180,8 @@ router.post('/', upload.array('files'), async (req, res) => {
         console.log(`Input path: ${inputPath}`);
         console.log(`Output path: ${pptxPath}`);
 
-        // Convert PDF to PPTX
         await pdfToPptx(inputPath, pptxPath);
 
-        // Delete uploaded PDF
         await fs.unlink(inputPath).catch((err) => console.error(`Failed to delete ${inputPath}:`, err));
 
         console.log(`Successfully converted ${file.originalname} to ${pptxFilename}`);
@@ -210,7 +194,6 @@ router.post('/', upload.array('files'), async (req, res) => {
         });
       } catch (fileError) {
         console.error(`Conversion failed for ${file.originalname}:`, fileError);
-        // Clean up on error
         await fs.unlink(file.path).catch((err) => console.error(`Failed to delete ${file.path}:`, err));
         continue;
       }
