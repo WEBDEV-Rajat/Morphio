@@ -76,7 +76,6 @@ function Dashboard() {
           <div className="relative h-96 lg:h-[500px]">
             <FloatingIcon icon={FileText} color="bg-red-500" delay={0} position={{ top: '5%', left: '2%' }} />
             <FloatingIcon icon={Lock} color="bg-purple-500" delay={0.5} position={{ top: '8%', right: '5%' }} />
-            <FloatingIcon icon={Minimize2} color="bg-green-500" delay={1} position={{ top: '45%', left: '0%' }} />
             <FloatingIcon icon={FileImage} color="bg-yellow-500" delay={1.5} position={{ bottom: '10%', right: '2%' }} />
             <FloatingIcon icon={File} color="bg-blue-500" delay={2} position={{ bottom: '5%', left: '8%' }} />
 
