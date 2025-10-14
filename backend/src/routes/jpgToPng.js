@@ -16,7 +16,7 @@ const upload = multer({
       cb(new Error("Only JPG/JPEG files are allowed"), false);
     }
   },
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 100 * 1024 * 1024 },
 });
 
 const uploadsDir = path.resolve("uploads");

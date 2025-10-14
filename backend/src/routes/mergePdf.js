@@ -8,7 +8,7 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 
-router.post("/", upload.array("files", 10), async (req, res) => {
+router.post("/", upload.array("files", 20), async (req, res) => {
   try {
     if (!req.files || req.files.length < 2) {
       return res.status(400).send("Please upload at least 2 PDF files");

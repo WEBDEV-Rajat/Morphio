@@ -33,6 +33,7 @@ const upload = multer({
       cb(new Error("Only PDF files are allowed"), false);
     }
   },
+  limits: { fileSize: 100 * 1024 * 1024 },
 });
 
 router.post("/", upload.single("file"), async (req, res) => {

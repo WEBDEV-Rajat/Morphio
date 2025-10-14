@@ -6,7 +6,18 @@ import fs from "fs";
 
 const router = express.Router();
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({
+  dest: "uploads/",
+  fileFilter: (req, file, cb) => {
+    console.log("Received file:", file.originalname, "MIME type:", file.mimetype);
+    if (file.mimetype === "image/png") {
+      cb(null, true);
+    } else {
+      cb(new Error("Only PNG files are allowed"), false);
+    }
+  },
+  limits: { fileSize: 100 * 1024 * 1024 }, 
+});
 
 router.post("/", upload.single("file"), (req, res) => {
   const { password } = req.body;

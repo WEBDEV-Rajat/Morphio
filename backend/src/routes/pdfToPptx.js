@@ -52,7 +52,8 @@ const upload = multer({
     } else {
       cb(new Error('Only PDF files are allowed'));
     }
-  }
+  }, 
+  limits: { fileSize: 100 * 1024 * 1024 }, 
 });
 
 async function convertPdfToImages(pdfPath, outputDir, prefix) {

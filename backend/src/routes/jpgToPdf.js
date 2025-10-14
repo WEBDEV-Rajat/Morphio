@@ -17,8 +17,8 @@ const upload = multer({
       cb(new Error("Only image files are allowed"), false);
     }
   },
-  limits: { fileSize: 10 * 1024 * 1024 }, 
-}).array("files", 10);
+  limits: { fileSize: 100 * 1024 * 1024 }, 
+}).array("files", 20);
 
 const uploadsDir = path.resolve("uploads");
 if (!fs.existsSync(uploadsDir)) {
