@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Download } from "lucide-react";
+import { toast } from "react-toastify";
 
 const ProtectPdf = () => {
   const [file, setFile] = useState(null);
@@ -13,9 +14,22 @@ const ProtectPdf = () => {
 
   const handleFileChange = (e) => {
     if (e.target.files?.[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+
+      if (selectedFile.type !== "application/pdf") {
+        toast.error("Please upload a valid PDF file");
+        return;
+      }
+
+      if (selectedFile.size > 100 * 1024 * 1024) {
+        toast.warning("File size exceeds 100 MB limit!");
+        return;
+      }
+
+      setFile(selectedFile);
       setProtectedUrl(null);
       setError(null);
+      toast.info("PDF file added successfully");
     }
   };
 
@@ -23,15 +37,28 @@ const ProtectPdf = () => {
     e.preventDefault();
     setDragOver(false);
     if (e.dataTransfer.files?.[0]) {
-      setFile(e.dataTransfer.files[0]);
+      const droppedFile = e.dataTransfer.files[0];
+
+      if (droppedFile.type !== "application/pdf") {
+        toast.error("Please upload a valid PDF file");
+        return;
+      }
+
+      if (droppedFile.size > 100 * 1024 * 1024) {
+        toast.warning("File size exceeds 100 MB limit!");
+        return;
+      }
+
+      setFile(droppedFile);
       setProtectedUrl(null);
       setError(null);
+      toast.info("PDF file added successfully");
     }
   };
 
   const handleConvert = async () => {
-    if (!file) return alert("Please upload a PDF file");
-    if (!password) return alert("Please enter a password");
+    if (!file) return toast.error("Please upload a PDF file first");
+    if (!password) return toast.warning("Please enter a password");
 
     const formData = new FormData();
     formData.append("file", file);
@@ -48,12 +75,16 @@ const ProtectPdf = () => {
         },
       });
 
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+      const url = window.URL.createObjectURL(
+        new Blob([response.data], { type: "application/pdf" })
+      );
       setProtectedUrl(url);
       setProgress(100);
+      toast.success("PDF protected successfully!");
     } catch (err) {
       console.error("Protect error:", err.response?.data, err.message);
       setError("Failed to protect PDF. Check console for details.");
+      toast.error("Failed to protect PDF. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -89,6 +120,7 @@ const ProtectPdf = () => {
             className="hidden"
           />
         </div>
+
         <input
           type="password"
           placeholder="Enter password"
@@ -116,7 +148,6 @@ const ProtectPdf = () => {
           </div>
         )}
 
-
         {protectedUrl && (
           <div className="mt-6 text-center">
             <iframe
@@ -129,7 +160,9 @@ const ProtectPdf = () => {
               download="protected.pdf"
               className="mt-4 translate-y-2 font-bold rounded-lg shadow-md transition-all"
             >
-              <span className="flex gap-4 justify-center py-5 rounded-2xl bg-green-600 hover:bg-green-700 text-white"><Download/> Download PDF</span>
+              <span className="flex gap-4 justify-center py-5 rounded-2xl bg-green-600 hover:bg-green-700 text-white">
+                <Download /> Download PDF
+              </span>
             </a>
           </div>
         )}

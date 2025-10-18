@@ -10,10 +10,10 @@ const upload = multer({
   dest: "uploads/",
   fileFilter: (req, file, cb) => {
     console.log("Received file:", file.originalname, "MIME type:", file.mimetype);
-    if (file.mimetype === "image/png") {
+    if (file.mimetype === "application/pdf") {
       cb(null, true);
     } else {
-      cb(new Error("Only PNG files are allowed"), false);
+      cb(new Error("Only PDF files are allowed"), false);
     }
   },
   limits: { fileSize: 100 * 1024 * 1024 }, 

@@ -2,8 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { Download } from "lucide-react";
+import { toast } from "react-toastify";
 
-const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiEndpoint = "merge-pdf" }) => {
+const MergePdf = ({
+  title = "Merge PDFs",
+  uploadAccept = "application/pdf",
+  apiEndpoint = "merge-pdf",
+}) => {
   const [files, setFiles] = useState([]);
   const [mergedUrl, setMergedUrl] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -13,7 +18,15 @@ const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiE
 
   const handleFileChange = (e) => {
     if (e.target.files?.length) {
-      setFiles((prevFiles) => [...prevFiles, ...Array.from(e.target.files)]);
+      const newFiles = Array.from(e.target.files);
+      const totalFiles = files.length + newFiles.length;
+
+      if (totalFiles > 10) {
+        toast.warning("You can upload a maximum of 10 PDFs only!");
+        return;
+      }
+
+      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
       setMergedUrl(null);
       setError(null);
     }
@@ -22,8 +35,17 @@ const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiE
   const handleDrop = (e) => {
     e.preventDefault();
     setDragActive(false);
+
     if (e.dataTransfer.files?.length) {
-      setFiles((prevFiles) => [...prevFiles, ...Array.from(e.dataTransfer.files)]);
+      const newFiles = Array.from(e.dataTransfer.files);
+      const totalFiles = files.length + newFiles.length;
+
+      if (totalFiles > 10) {
+        toast.warning("You can upload a maximum of 10 PDFs only!");
+        return;
+      }
+
+      setFiles((prevFiles) => [...prevFiles, ...newFiles]);
       setMergedUrl(null);
       setError(null);
     }
@@ -53,7 +75,9 @@ const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiE
       console.log("Response headers:", response.headers);
       console.log("Response data size:", response.data.size);
 
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+      const url = window.URL.createObjectURL(
+        new Blob([response.data], { type: "application/pdf" })
+      );
       setMergedUrl(url);
       setProgress(100);
     } catch (err) {
@@ -65,7 +89,9 @@ const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiE
   };
 
   const handleRemoveFile = (indexToRemove) => {
-    setFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
+    setFiles((prevFiles) =>
+      prevFiles.filter((_, index) => index !== indexToRemove)
+    );
     setMergedUrl(null);
     setError(null);
   };
@@ -89,7 +115,11 @@ const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiE
         onDragLeave={() => setDragActive(false)}
         onDrop={handleDrop}
         className={`w-full max-w-md h-48 flex flex-col items-center justify-center border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300
-          ${dragActive ? "border-indigo-600 bg-indigo-50" : "border-gray-300 bg-white"}`}
+          ${
+            dragActive
+              ? "border-indigo-600 bg-indigo-50"
+              : "border-gray-300 bg-white"
+          }`}
       >
         <input
           type="file"
@@ -99,8 +129,13 @@ const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiE
           className="hidden"
           id="fileInput"
         />
-        <label htmlFor="fileInput" className="text-gray-700 text-center px-4 py-2">
-          {files.length > 0 ? `📂 ${files.length} file(s) selected` : "Drag & Drop or Click to Upload PDFs"}
+        <label
+          htmlFor="fileInput"
+          className="text-gray-700 text-center px-4 py-2"
+        >
+          {files.length > 0
+            ? `📂 ${files.length} file(s) selected`
+            : "Drag & Drop or Click to Upload PDFs"}
         </label>
       </div>
 
@@ -152,7 +187,9 @@ const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiE
       {/* Preview & Download */}
       {mergedUrl && (
         <div className="mt-8 w-full max-w-2xl text-center">
-          <h2 className="text-xl font-semibold text-green-700 mb-4">✅ Merged PDF Ready!</h2>
+          <h2 className="text-xl font-semibold text-green-700 mb-4">
+            ✅ Merged PDF Ready!
+          </h2>
           <div className="grid grid-cols-1 gap-4 w-full">
             <iframe
               src={mergedUrl}
@@ -165,7 +202,9 @@ const MergePdf = ({ title = "Merge PDFs", uploadAccept = "application/pdf", apiE
             download="merged.pdf"
             className="mt-4 translate-y-2 font-bold rounded-lg shadow-md transition-all"
           >
-            <span className="flex gap-4 justify-center py-5 rounded-2xl bg-green-600 hover:bg-green-700 text-white"><Download/> Download PDF</span>
+            <span className="flex gap-4 justify-center py-5 rounded-2xl bg-green-600 hover:bg-green-700 text-white">
+              <Download /> Download PDF
+            </span>
           </a>
         </div>
       )}

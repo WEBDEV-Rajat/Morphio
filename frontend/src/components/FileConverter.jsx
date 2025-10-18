@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import img1 from "../../src/assets/open-folder.png";
 import img2 from "../../src/assets/closed-folder.png";
 import { Download, File } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const FileConverter = ({ 
   title, 
@@ -16,11 +18,61 @@ const FileConverter = ({
   const [progress, setProgress] = useState(0);
   const [dragActive, setDragActive] = useState(false);
 
+  const MAX_FILE_SIZE = 100 * 1024 * 1024; 
+
+  const validateFiles = (selectedFiles) => {
+    const validFiles = [];
+    const acceptedTypes = uploadAccept.split(",").map(type => type.trim());
+
+    Array.from(selectedFiles).forEach(file => {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`File "${file.name}" exceeds 100MB limit`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        return;
+      }
+
+      const fileExtension = `.${file.name.split('.').pop().toLowerCase()}`;
+      if (!acceptedTypes.includes(fileExtension) && !acceptedTypes.includes(file.type)) {
+        toast.error(`File "${file.name}" is not a supported type`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        return;
+      }
+
+      validFiles.push(file);
+    });
+
+    return validFiles;
+  };
+
   const handleFileSelect = (selectedFiles) => {
-    const newFiles = [...files, ...Array.from(selectedFiles)];
-    setFiles(newFiles);
-    setConvertedFiles([]);
-    setProgress(0);
+    const validFiles = validateFiles(selectedFiles);
+    
+    if (validFiles.length > 0) {
+      const newFiles = [...files, ...validFiles];
+      setFiles(newFiles);
+      setConvertedFiles([]);
+      setProgress(0);
+      toast.success(`${validFiles.length} file(s) uploaded successfully`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
   };
 
   const handleFileChange = (e) => {
@@ -34,7 +86,17 @@ const FileConverter = ({
   };
 
   const handleConvert = async () => {
-    if (!files.length) return alert("Please upload files first");
+    if (!files.length) {
+      toast.warn("Please upload files first", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      return;
+    }
 
     setLoading(true);
     setProgress(0);
@@ -83,7 +145,7 @@ const FileConverter = ({
                 url: fullUrl,
                 outputType,
                 isBlob: false,
-                originalName: fileObj.originalName // Use for display
+                originalName: fileObj.originalName
               };
             });
 
@@ -92,6 +154,14 @@ const FileConverter = ({
           
           setLoading(false);
           setProgress(100);
+          toast.success("Files converted successfully!", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
         } else {
           throw new Error(`Server responded with status ${xhr.status}`);
         }
@@ -99,7 +169,15 @@ const FileConverter = ({
 
       xhr.onerror = () => {
         console.error("Conversion Error: Network error");
-        alert("Conversion failed. Check console and ensure backend is running.");
+        toast.error("Conversion failed. Check console and ensure backend is running.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme : "dark"
+        });
         setLoading(false);
       };
 
@@ -112,7 +190,14 @@ const FileConverter = ({
       xhr.send(formData);
     } catch (err) {
       console.error("Conversion Error:", err.message);
-      alert("Conversion failed. Check console for details and ensure backend is running.");
+      toast.error("Conversion failed. Check console for details.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       setLoading(false);
     }
   };
@@ -252,7 +337,14 @@ const FileConverter = ({
       }
     } catch (error) {
       console.error(`Download error for ${file.name}:`, error);
-      alert(`Failed to download ${file.name}. The file may not exist or the server is unreachable. Trying to open in new tab.`);
+      toast.error(`Failed to download ${file.name}. Trying to open in new tab.`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       window.open(file.url, '_blank');
     }
   };
@@ -265,6 +357,7 @@ const FileConverter = ({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <ToastContainer />
       <div className="text-center mb-8">
         <h1 className="text-5xl font-bold text-gray-900 mb-2 drop-shadow-sm">
           {title}

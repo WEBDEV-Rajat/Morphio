@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { Download } from "lucide-react";
+import { toast } from "react-toastify";
 
 const CompressPdf = () => {
   const [file, setFile] = useState(null);
@@ -15,8 +16,16 @@ const CompressPdf = () => {
   const handleFileSelect = (f) => {
     if (f.type !== "application/pdf") {
       setError("Please upload a valid PDF file");
+      toast.error("Please upload a valid PDF file");
       return;
     }
+
+    if (f.size > 100 * 1024 * 1024) {
+      setError("File size exceeds 100 MB");
+      toast.warning("File size exceeds 100 MB limit!");
+      return;
+    }
+
     setFile(f);
     setConvertedFile(null);
     setError(null);
@@ -62,18 +71,23 @@ const CompressPdf = () => {
         }
       );
 
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+      const url = window.URL.createObjectURL(
+        new Blob([response.data], { type: "application/pdf" })
+      );
       setConvertedFile(url);
 
       setTimeout(() => {
         setLoading(false);
         setProgress(100);
+        toast.success("Compression successful!");
       }, 1000);
     } catch (error) {
       console.error("Compression failed:", error);
       const errorMessage =
-        error.response?.data?.details || "Compression failed. Please try again.";
+        error.response?.data?.details ||
+        "Compression failed. Please try again.";
       setError(errorMessage);
+      toast.error("Compression failed. Please try again.");
       setLoading(false);
     }
   };
@@ -162,18 +176,27 @@ const CompressPdf = () => {
 
       {convertedFile && (
         <div className="mt-6 w-full max-w-2xl text-center">
-          <h2 className="text-lg font-semibold mb-4">
-            Compression Successful!
-          </h2>
           <div className="relative">
             <iframe
               src={`${convertedFile}#view=FitH`}
               className="w-full h-96 border rounded-lg shadow mb-5"
               title="Preview"
-              onError={() => setError("Failed to preview PDF. Try downloading instead.")}
+              onError={() =>
+                setError("Failed to preview PDF. Try downloading instead.")
+              }
             />
             {error && (
-              <p className="text-red-600 mt-2">Failed to preview. <a href={convertedFile} download="compressed.pdf" className="text-blue-600 underline">Download</a> to view.</p>
+              <p className="text-red-600 mt-2">
+                Failed to preview.{" "}
+                <a
+                  href={convertedFile}
+                  download="compressed.pdf"
+                  className="text-blue-600 underline"
+                >
+                  Download
+                </a>{" "}
+                to view.
+              </p>
             )}
           </div>
           <a
@@ -181,7 +204,9 @@ const CompressPdf = () => {
             download="compressed.pdf"
             className="mt-4 translate-y-2 font-bold rounded-lg shadow-md transition-all"
           >
-             <span className="flex gap-4 justify-center py-5 rounded-2xl bg-green-600 text-white"><Download/> Download PDF</span>
+            <span className="flex gap-4 justify-center py-5 rounded-2xl bg-green-600 text-white">
+              <Download /> Download PDF
+            </span>
           </a>
         </div>
       )}
