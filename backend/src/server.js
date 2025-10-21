@@ -1,4 +1,3 @@
-// backend/src/server.js
 import express from "express";
 import cors from "cors";
 import path from "path";
@@ -13,6 +12,7 @@ import pngToJpgRoutes from "./routes/pngToJpg.js";
 import mergePdfRoutes from "./routes/mergePdf.js";
 import protectPdfRoutes from "./routes/pdfProtect.js";
 import pdfToPptxRoutes from "./routes/pdfToPptx.js";
+import editPdfRoutes from "./routes/editPdf.js"
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -35,6 +35,7 @@ app.use("/api/convert/png-to-jpg", pngToJpgRoutes);
 app.use("/api/convert/pdf-to-pptx", pdfToPptxRoutes);
 app.use("/api/merge-pdf", mergePdfRoutes);
 app.use("/api/protect-pdf", protectPdfRoutes);
+app.use("/api/edit-pdf", editPdfRoutes);
 
 app.get("/", (req, res) => {
   res.send(" File Conversion API is running...");

@@ -171,6 +171,9 @@ function Navbar() {
             <li>
               <NavLink to="/merge-pdf" className="hover:text-gray-900 transition-colors">Merge</NavLink>
             </li>
+            <li>
+              <NavLink to="/edit-pdf" className="hover:text-gray-900 transition-colors">Edit PDF</NavLink>
+            </li>
           </ul>
         </div>
       </div>

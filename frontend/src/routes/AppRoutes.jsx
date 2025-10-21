@@ -11,6 +11,7 @@ import PngtoJpg from "../pages/ToolPages/PngtoJpg.jsx";
 import JpgToPng from "../pages/ToolPages/JpgToPng.jsx";
 import MergePdf from "../pages/ToolPages/MergePdf.jsx";
 import PdfProtect from "../pages/ToolPages/PdfProtect.jsx";
+import EditPdf from "../pages/ToolPages/EditPdf.jsx";
 
 function AppRoutes() {
   return (
@@ -27,6 +28,7 @@ function AppRoutes() {
       <Route path="/png-to-jpg" element={<PngtoJpg/>} />
       <Route path="/protect-pdf" element={<PdfProtect/>} />
       <Route path="/pdf-to-pptx" element={<PdfToPptx/>} />
+      <Route path="/edit-pdf" element={<EditPdf/>}/>
     </Routes> 
   );
 }
